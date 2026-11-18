@@ -27,14 +27,14 @@ Bu proje, 2024–2025 Bahar Yarıyılı **Görsel Programlama** dersi kapsamınd
 Kullanıcı arayüzü anlık olarak tema değiştirme özelliğine sahiptir. Göz yormayan bir deneyim için ideal.
 
 ### 🔍 Arama Motoru
-Üye ve kitap listelerinde anlık arama yaparak hızlı erişim sağlar. QLineEdit + QSortFilterProxyModel altyapısı kullanılmıştır.
+Üye ve kitap listelerinde anlık arama yaparak hızlı erişim sağlar. Arama kutusuna yazıldıkça, parametreli SQL `LIKE` sorgusu (`prepare()` + `addBindValue()`) ile filtreleme yapılır.
 
 ---
 
 ## 📦 Teknolojiler
 
 - **C++**
-- **Qt 5 / Qt 6**
+- **Qt 5** (Widgets, Qt SQL)
 - **Qt Designer**
 - **SQLite**
 
@@ -57,7 +57,7 @@ Kullanıcı arayüzü anlık olarak tema değiştirme özelliğine sahiptir. Gö
 ## 📥 Kurulum Talimatları
 
 1. `.pro` dosyasını Qt Creator ile açın.
-2. `database.db` dosyasını proje dizinine yerleştirin.
+2. `Kutuphane.db` dosyasını derlenen uygulamanın (.exe) bulunduğu dizine veya çalışma dizinine kopyalayın.
 3. Derleyin ve çalıştırın.
 4. Tema ve arama motorunu test etmeyi unutmayın!
 
