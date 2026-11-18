@@ -85,6 +85,10 @@ void odunc_teslim_etme_islemleri::on_pushButton_clicked()
         return;
     }
 
+    // Teslim kaydı ekleme ve ödünç kaydı silme tek bir atomik işlem olarak yürütülür
+    QSqlDatabase db = QSqlDatabase::database();
+    db.transaction();
+
     // 1. Teslim kaydı ekle
     sorgu->prepare("INSERT INTO odunc_teslim_edilen(uye_no, kitap_no, alma_tarihi, verme_tarihi, borc) VALUES (?, ?, ?, ?, ?)");
     sorgu->addBindValue(uyeNo);
@@ -94,6 +98,7 @@ void odunc_teslim_etme_islemleri::on_pushButton_clicked()
     sorgu->addBindValue(borc);
 
     if (!sorgu->exec()) {
+        db.rollback();
         QMessageBox::critical(this, "Hata", "Teslim kaydı eklenemedi:\n" + sorgu->lastError().text());
         return;
     }
@@ -106,7 +111,14 @@ void odunc_teslim_etme_islemleri::on_pushButton_clicked()
     silmeQuery.addBindValue(almaTarihi);
 
     if (!silmeQuery.exec()) {
+        db.rollback();
         QMessageBox::critical(this, "Hata", "Ödünç kaydı silinemedi:\n" + silmeQuery.lastError().text());
+        return;
+    }
+
+    if (!db.commit()) {
+        db.rollback();
+        QMessageBox::critical(this, "Hata", "İşlem kaydedilemedi:\n" + db.lastError().text());
         return;
     }
 
