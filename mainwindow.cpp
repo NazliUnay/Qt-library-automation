@@ -2,24 +2,43 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 
+#include <QCoreApplication>
+#include <QDir>
+#include <QFile>
+#include <QStringList>
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
-    // Veritabanı dosya yolu
-    db.setDatabaseName("Kütüphane.db");
-
     // Durum çubuğuna mesaj için etiket
     kaliciMesaj = new QLabel(this);
     ui->statusbar->addWidget(kaliciMesaj);
 
-    // Veritabanı bağlantısı kontrolü
-    if (!db.open())
+    // Veritabanı dosya yolu: önce uygulamanın bulunduğu dizin, yoksa çalışma dizini.
+    // Not: SQLite, dosya yoksa boş bir veritabanı oluşturup bağlantıyı başarılı sayar;
+    // bu yüzden dosyanın varlığı ve tablolar ayrıca kontrol edilir.
+    QString dbYolu = QCoreApplication::applicationDirPath() + "/Kutuphane.db";
+    if (!QFile::exists(dbYolu))
+        dbYolu = QDir::current().filePath("Kutuphane.db");
+
+    if (!QFile::exists(dbYolu)) {
+        kaliciMesaj->setText("Veritabanı dosyası bulunamadı: Kutuphane.db");
+        return;
+    }
+
+    db.setDatabaseName(dbYolu);
+
+    // Veritabanı bağlantısı ve şema kontrolü
+    if (!db.open()) {
         kaliciMesaj->setText("Veritabanına Bağlanılamadı!");
-    else
+    } else if (!db.tables().contains("uye") || !db.tables().contains("kitap")) {
+        kaliciMesaj->setText("Veritabanı açıldı ancak gerekli tablolar bulunamadı!");
+    } else {
         kaliciMesaj->setText("Veritabanına Bağlanıldı!");
+    }
 }
 
 MainWindow::~MainWindow()
